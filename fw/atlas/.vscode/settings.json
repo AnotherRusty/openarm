@@ -1,6 +1,0 @@
-{
-    "terminal.integrated.env.linux": {
-        "PATH": "/home/danny/.platformio/penv/bin:/home/danny/.platformio/penv:/home/danny/.local/share/umake/bin:/home/danny/bin:/home/danny/.local/bin:/opt/ros/kinetic/bin:/home/danny/.local/share/umake/bin:/home/danny/bin:/home/danny/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
-        "PLATFORMIO_CALLER": "vscode"
-    }
-}
