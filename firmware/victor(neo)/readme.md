@@ -27,7 +27,7 @@ ps2_params  PS2手柄相关参数
 
     -D ROBOT_NAME='"Victor5"' ; "Neo5"          机械臂名称
     -D BAUDRATE=9600                            波特率
-    -D SERVO_SPEED=0.5  ;do not exceed 1.0      舵机转速（不要设置超过1.0）
+    -D SERVO_SPEED=0.5  ;do not exceed 1.0      关节转速（不要设置超过1.0）
     -D NUM_JOINTS=5                             关节数
     -D DEBUG_ON=0                               调试输出开关
     -D USE_PS2=0                                PS2手柄控制开关

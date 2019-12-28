@@ -1,9 +1,3 @@
-/* OPENARM Firmware *****************
-    -Arm model: Victor
-    -Version 1.0
-
-    Danny @ openarm 2019
-************************************/
 #ifndef DEBUGGER_H_
 #define DEBUGGER_H_
 

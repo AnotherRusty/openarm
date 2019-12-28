@@ -1,9 +1,3 @@
-/* OPENARM Firmware *****************
-    -Arm model: Victor
-    -Version 1.0
-
-    Danny @ openarm 2019
-************************************/
 #include "Gateway.h"
 #include "Protocol.h"
 #include "Debugger.h"

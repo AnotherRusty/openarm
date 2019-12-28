@@ -1,24 +1,5 @@
-DOC 6001-0000-0900
-OPENARM, COPYRIGHT 2019
+代码解析
 
-#单片机代码教程
-
-
-###开发环境：
-openarm单片机（Arduino UNO / mega2560）源码用platformio开发。
-
-首先需要安装vscode，https://code.visualstudio.com
-安装完成后在扩展插件（Extension）中搜索并安装platformio IDE
-
-
-###编译上传
-安装platformio插件后打开源码文件夹，例如firmware/victor(neo)/
-点击下方 √ 进行编译
-成功后点击 → 进行烧录
-
-
-###代码解析
-以victor(neo)机械臂代码为例：
 源码文件目录
 ├── lib
 │   ├── Config
@@ -83,10 +64,10 @@ platformio.ini编写规则详见http://docs.platformio.org/en/latest/projectconf
     × Debugger          串口调试类（单例），用于调试串口输出
     × Gateway           通讯类及通讯协议
     × Interface         接口类，抽象一些关键的类为接口，提高程序扩展性
+    × Joints            关节类（例如：ServoJoint-舵机关节），具体控制关节运动
     × Joystick          遥控手柄类
     × Robot             机器人类
     × RobotData         机器人状态数据类（单例），用于保存机器人的状态信息
     × SerialTransport   串口类，负责串口的收发
-    × ServoJoint        舵机关节类，具体控制舵机
 具体见文件中的解释。
 

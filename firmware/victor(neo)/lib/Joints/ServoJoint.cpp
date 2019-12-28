@@ -1,9 +1,3 @@
-/* OPENARM Firmware *****************
-    -Arm model: Victor
-    -Version 1.0
-
-    Danny @ openarm 2019
-************************************/
 #include "ServoJoint.h"
 #include "Debugger.h"
 #include "Config.h"

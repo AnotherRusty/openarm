@@ -1,9 +1,3 @@
-/* OPENARM Firmware *****************
-    -Arm model: Victor
-    -Version 1.0
-
-    Danny @ openarm 2019
-************************************/
 #ifndef SERIAL_TRANSPORT_H_
 #define SERIAL_TRANSPORT_H_
 

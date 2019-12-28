@@ -1,9 +1,3 @@
-/* OPENARM Firmware *****************
-    -Arm model: Victor （or Neo)
-    -Version 1.0
-
-    Danny @ openarm 2019
-************************************/
 #pragma once
 
 /**** MODIFY WITH CAUTION （不要随意修改！！！）: 
