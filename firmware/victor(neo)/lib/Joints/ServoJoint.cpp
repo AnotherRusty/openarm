@@ -12,6 +12,7 @@ ServoJoint::ServoJoint(uint8_t pin, unsigned short max_angle){
     _pin = pin;
     _max_angle = max_angle;
     _move_interval = double(INTERVAL) / SERVO_SPEED;
+    _reverse_flag = false;
 }
 
 // 初始化
@@ -31,14 +32,20 @@ void ServoJoint::init(){
 void ServoJoint::move(unsigned short angle){
     Debugger::get()->printf("Move sevo on pin%d to angle: %d", _pin, angle);
 
+    unsigned short target;
+    if(!_reverse_flag)
+        target = min(max(0, angle), _max_angle);
+    else
+        target = min(max(0, _max_angle-angle), _max_angle);
+
     if((micros()-_t_last)>_move_interval){
-        if(min(max(0, angle), _max_angle)==_angle)
+        if(target ==_angle)
             return;
-        if(min(max(0, angle), _max_angle)>_angle)
+        if(target >_angle)
         {
             _servo.write(++_angle);
         }
-        else if (min(max(0, angle), _max_angle)<_angle)
+        else if (target <_angle)
         {
             _servo.write(--_angle);
         }
@@ -47,7 +54,10 @@ void ServoJoint::move(unsigned short angle){
 }
 
 void ServoJoint::direct_move(unsigned short angle){
-    _angle = angle;
+    if(!_reverse_flag)
+        _angle = angle;
+    else
+        _angle = _max_angle - angle;
     _servo.write(_angle);
 }
 
@@ -55,5 +65,12 @@ void ServoJoint::direct_move(unsigned short angle){
 // 参数： None
 // 返回值 unsigned short 当前角度
 unsigned short ServoJoint::get_position(){
-    return _angle;
+    if(!_reverse_flag)
+        return _angle;
+    else
+        return (_max_angle-_angle);
+}
+
+void ServoJoint::set_reverse(bool reverse){
+    _reverse_flag = reverse;
 }

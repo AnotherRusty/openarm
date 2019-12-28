@@ -5,6 +5,7 @@
 #include <Arduino.h>
 #include "IJoint.h"
 #include "Servo.h"
+#include "Config.h"
 
 /* ServoJoint类
 舵机关节，集成了IJoint，负责具体驱动舵机动作
@@ -20,6 +21,7 @@ public:
     void move(unsigned short angle);
     void direct_move(unsigned short angle);
     unsigned short get_position();
+    void set_reverse(bool reverse);
 
 private:
     uint8_t _pin;
@@ -28,6 +30,8 @@ private:
     Servo   _servo;
     uint16_t _move_interval;
     uint32_t _t_last;
+    bool _reverse_flag;
+
 };
 
 

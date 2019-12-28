@@ -32,6 +32,23 @@ void setup() {
     robot.add_joint(2, &joint2);
     robot.add_joint(3, &joint3);
     robot.add_joint(4, &joint4);
+
+// 设置关节正反转
+#if JOINT0_REVERSE
+    joint0.set_reverse(1);
+#endif
+#if JOINT1_REVERSE
+    joint1.set_reverse(1);
+#endif
+#if JOINT2_REVERSE
+    joint2.set_reverse(1);
+#endif
+#if JOINT3_REVERSE
+    joint3.set_reverse(1);
+#endif
+#if JOINT4_REVERSE
+    joint4.set_reverse(1);
+#endif
     
     // 初始化robot
     robot.init();
