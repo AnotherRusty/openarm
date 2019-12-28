@@ -12,6 +12,11 @@
 #include "IJoint.h"
 #include "Servo.h"
 
+/* ServoJoint类
+舵机关节，集成了IJoint，负责具体驱动舵机动作
+利用了第三方Arduino库 Servo 控制舵机
+
+*/
 class ServoJoint: public IJoint
 {
 public:

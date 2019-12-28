@@ -9,14 +9,14 @@
 
 
 Debugger::Debugger(){
-#if DEBUG_ENABLE
-    DEBUG_SERIAL.begin(DEBUG_BAUDRATE);
+#if DEBUG_ENABLE    // UNO不支持串口调试 DEBUG_ENABLE=0
+    DEBUG_SERIAL.begin(DEBUG_BAUDRATE); // 初始化debug串口
 #endif
 }
 
 int Debugger::printf(char *fmt, ...){
     int n = 0;
-#if DEBUG_ON
+#if DEBUG_ON    // DEBUG开关宏
     va_list args;
     va_start(args, fmt);
     n = vsprintf(sprint_buf, fmt, args);

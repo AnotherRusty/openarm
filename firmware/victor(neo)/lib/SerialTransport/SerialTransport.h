@@ -11,6 +11,10 @@
 #include "ITransport.h"
 #include "Config.h"
 
+
+/* SerialTransport类
+继承了ITransport接口，负责串口数据的收发
+*/
 class SerialTransport : public ITransport
 {
 public:
