@@ -21,13 +21,15 @@ WINDOW_SIZE_1 = "300x180" # width*height
 WINDOW_SIZE_2 = "600x400" # width*height
 UPDATE_INTERVAL = 0.5 # seconds
 MODEL_LIST = ["victor", "neo"]
+PORT_LIST = ["/dev/openarm", "/dev/ttyUSB0", "/dev/ttyACM0"]
+BAUDRATE_LIST = [300, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200]
 
 
 class Application(object):
     def __init__(self):
         self.root = tk.Tk()
         self.root.geometry(WINDOW_SIZE_1)
-        self.root.title("ArmMaster - OPENARM control console")
+        self.root.title("ArmMaster - 机械臂测试程序")
         self.root.resizable(0, 0)
         sysstr = platform.system()
         if sysstr == "Windows":
@@ -44,16 +46,17 @@ class Application(object):
         Label(self.setting_frame, text="类型").grid(row=0, column=0, pady=20, sticky=W)
         self.robot_model = ttk.Combobox(self.setting_frame, values=MODEL_LIST)
         self.robot_model.grid(row=0, column=1, pady=20)
+        self.robot_model.current(0)
 
-        self.port = StringVar(value="/dev/tty")
         Label(self.setting_frame, text="端口").grid(row=1, column=0, sticky=W)
-        self.port_entry = Entry(self.setting_frame, textvariable=self.port)
-        self.port_entry.grid(row=1, column=1, sticky=W+E)
+        self.port = ttk.Combobox(self.setting_frame, values=PORT_LIST)
+        self.port.grid(row=1, column=1, sticky=W+E)
+        self.port.current(0)
 
-        self.baudrate = StringVar(value="9600")
         Label(self.setting_frame, text="波特率").grid(row=2, column=0, pady=5, sticky=W)
-        self.baudrate_entry = Entry(self.setting_frame, textvariable=self.baudrate)
-        self.baudrate_entry.grid(row=2, column=1, pady=5, sticky=W+E)
+        self.baudrate = ttk.Combobox(self.setting_frame, values=BAUDRATE_LIST)
+        self.baudrate.grid(row=2, column=1, pady=5, sticky=W+E)
+        self.baudrate.current(4)    # default option 9600
 
         Button(self.setting_frame, text="连接", width=10, command=self.start_main).grid(row=3, column=1, pady=10, sticky=E)
         
@@ -65,7 +68,7 @@ class Application(object):
 
         model = self.robot_model.get()
         port = self.port.get()
-        baudrate = int(self.baudrate.get())
+        baudrate = self.baudrate.get()
 
         print("Configuring robot ...")
         if not self.robot.configure(model, port, baudrate):

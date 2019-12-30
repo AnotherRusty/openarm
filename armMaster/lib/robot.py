@@ -31,19 +31,19 @@ class Robot:
             self.__baudrate = baudrate
             self.__num_joints = len(conf['Joints'])
         except:
-            print("error occurred during configuration. please check settings.")
+            print("[Error] Configuration failed. \n ***** Please make sure " + self.name + ".yaml exists.")
             return False
         self.__configured = True
         return True
 
     def initialize(self):
         if not self.__configured:
-            print('robot has not been configured.')
+            print('[Error] Robot has not been configured.')
             return False
         try:
             self.__transport = Transport(self.__port, self.__baudrate)
         except:
-            print("serial initialization failed. \n Check serial settings.")
+            print("[Error] Serial initialization failed. \n ***** Check serial settings.")
             return False
         self.__proc = threading.Thread(name='robot process', target=self.__run)
         self.__proc.setDaemon(True)
