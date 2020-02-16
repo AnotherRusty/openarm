@@ -2,11 +2,6 @@
 #include <Arduino.h>
 #include "Debugger.h"
 
-
-void serialEvent(){
-
-}
-
 // 构造函数 
 // 参数： ser        HardwareSerial对象，具体Arduino的serial
 //       baudrate   波特率
