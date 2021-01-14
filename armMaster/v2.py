@@ -19,14 +19,19 @@ import threading
 from time import time as now, sleep
 
 
-window_size = "600x400"
-page_width = 600
-page_height = 300
+# load app configuration
+with open("config/app.yaml") as f:
+    conf = yaml.safe_load(f)
+    f.close()
 
-UPDATE_INTERVAL = 0.5 # seconds
-MODEL_LIST = ["victor", "neo"]
-PORT_LIST = ["/dev/openarm", "/dev/ttyUSB0", "/dev/ttyACM0"]
-BAUDRATE_LIST = [300, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200]
+window_size = conf["window_size"]
+page_width = conf["page_width"]
+page_height = conf["page_height"]
+
+update_interval = conf["update_interval"]
+model_list = conf["models"]
+port_list = conf["ports"]
+baudrate_list = conf["baudrates"]
 
 
 class ControlPage(Frame):
@@ -34,7 +39,25 @@ class ControlPage(Frame):
         Frame.__init__(self, width=page_width, height=page_height)
         self._root = root
 
-    def create(self):
+        self._initialized = False
+        self._active = False
+    
+    '''override'''
+    def pack(self):
+        self._create()
+        super().pack()
+
+    '''override'''
+    def pack_forget(self):
+        self._destroy()
+        super().pack_forget()
+
+    def _create(self):
+        self._active = True
+
+        if self._initialized:
+            return
+         
         if not self._root.robot_is_connected():
             self._root.status_info("机器人未连接。")
             return
@@ -91,6 +114,9 @@ class ControlPage(Frame):
         self.monit_loop.setDaemon(True)
         self.monit_loop.start()
 
+    # init complete
+        self._initialized = True
+    
     def _set_joints(self):
         angles = []
         for i in range(self.num_joints):
@@ -107,33 +133,42 @@ class ControlPage(Frame):
     def _monitor(self):
         t = now()
         while True:
-            if (now()- t)>UPDATE_INTERVAL:
+            if (now()- t)>update_interval:
+                if not self._active:
+                    continue
                 current_angles = self._root.get_robot().get_joint_angles()
                 if current_angles:
                     for i in range(self.num_joints):
                         self.current_angles[i].set(current_angles[i])
                     t = now()
 
+    def _destroy(self):
+        self._active = False
 
 class SettingPage(Frame):
     def __init__(self, root):
         Frame.__init__(self, width=page_width, height=page_height)
         self._root = root
-    
-    def create(self):
+
+    '''Override'''
+    def pack(self):
+        self._create()
+        super().pack()
+
+    def _create(self):
         # self.robot = Robot()
         Label(self, text="类型").grid(row=0, column=0, pady=20, sticky=W)
-        self.robot_model = ttk.Combobox(self, values=MODEL_LIST)
+        self.robot_model = ttk.Combobox(self, values=model_list)
         self.robot_model.grid(row=0, column=1, pady=20)
         self.robot_model.current(0)
 
         Label(self, text="端口").grid(row=1, column=0, sticky=W)
-        self.port = ttk.Combobox(self, values=PORT_LIST)
+        self.port = ttk.Combobox(self, values=port_list)
         self.port.grid(row=1, column=1, sticky=W+E)
         self.port.current(0)
 
         Label(self, text="波特率").grid(row=2, column=0, pady=5, sticky=W)
-        self.baudrate = ttk.Combobox(self, values=BAUDRATE_LIST)
+        self.baudrate = ttk.Combobox(self, values=baudrate_list)
         self.baudrate.grid(row=2, column=1, pady=5, sticky=W+E)
         self.baudrate.current(4)    # default option 9600
 
@@ -196,7 +231,9 @@ class Application(object):
                 self._connected = True
         else:
             # 是否需要建立新的连接？
-            pass
+            yes = messagebox.askokcancel("提示","已连接机械臂，是否建立新连接？")
+            if yes:
+                pass
 
     def status_info(self, val):
         self._statusbar.config(bg='white')
@@ -211,7 +248,6 @@ class Application(object):
         self._control_page = ControlPage(self)
         self._setting_page = SettingPage(self)
         self._current_page = self._setting_page
-        self._current_page.create()
         self._current_page.pack()
 
         # 菜单栏
@@ -238,7 +274,6 @@ class Application(object):
     def _change_page(self, page):
         self._current_page.pack_forget()
         self._current_page = page
-        self._current_page.create()
         self._current_page.pack()
 
 

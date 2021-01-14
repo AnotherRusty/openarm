@@ -1,0 +1,22 @@
+# configurations for the application
+
+window_size: "600x400"
+
+page_width: 600
+page_height: 300
+
+update_interval: 0.5  # seconds
+
+models:
+  - "victor"
+  - "neo"
+  - "alex"
+  #add new robot model here
+
+ports:
+  - "/dev/openarm"
+  - "/dev/ttyUSB0"
+  - "/dev/ttyACM0"
+  # add new port here
+
+baudrates: [300, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200]
