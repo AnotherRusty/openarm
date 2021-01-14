@@ -33,19 +33,94 @@ class ControlPage(Frame):
     def __init__(self, root):
         Frame.__init__(self, width=page_width, height=page_height)
         self._root = root
-        self._create()
 
-    def _create(self):
-        pass
+    def create(self):
+        if not self._root.robot_is_connected():
+            self._root.status_info("机器人未连接。")
+            return
+
+        model = self._root.robot_model
+        config_file = 'config/'+model+'.yaml'
+        with open(config_file) as f:
+            conf = yaml.safe_load(f)
+            f.close()
+
+        self.joints = conf['Joints']
+        self.num_joints = len(self.joints)
+        self.joint_scales = []
+        self.joint_angles = [IntVar() for i in range(self.num_joints)]
+        self.current_angles = [IntVar() for i in range(self.num_joints)]
+        self.joint_progresses = []
+        self.joint_feedback = []
+
+    # control container
+        self.control_container = Frame(self)
+        # joint scales
+        for i in range(self.num_joints):
+            Label(self.control_container, text=self.joints[i]["name"]).grid(row=i, column=0, padx=10, pady=10)
+            sc = Scale(self.control_container, orient=HORIZONTAL, sliderlength=10, resolution=1, \
+                            from_=self.joints[i]['params']['min_angle'], \
+                                to=self.joints[i]['params']['max_angle'], \
+                                    variable=self.joint_angles[i])
+            sc.grid(row=i, column=1, pady=10)
+            sc.set(self.joints[i]['params']['norm'])
+            self.joint_scales.append(sc)
+        
+        # set button
+        Button(self.control_container, text="设置", activebackground='grey', command=self._set_joints).grid(row=6, column=0, pady=20, sticky=W+E+N+S)
+        Button(self.control_container, text="重置", activebackground='grey', command=self._reset_joints).grid(row=6, column=1, pady=20, sticky=W+E+N+S)
+        
+        self.control_container.grid(row=0, column=0, rowspan=6, columnspan=2, padx=10, sticky=W+E+N+S)
+
+    # monitor container
+        self.monitor_contrainer = Frame(self)
+        # current angles info
+        Label(self.monitor_contrainer, text='当前关节角度: ').grid(row=0, column=1)
+        for i in range(self.num_joints):
+            pb = ttk.Progressbar(self.monitor_contrainer, orient=HORIZONTAL, maximum=180, length=300, mode='determinate', variable=self.current_angles[i])
+            pb.grid(row=i+1, column=1, pady=20)
+            self.joint_progresses.append(pb)
+            lb = Label(self.monitor_contrainer, width=10, textvariable=self.current_angles[i])
+            lb.grid(row=i+1, column=2, pady=20)
+            self.joint_feedback.append(lb)
+
+        self.monitor_contrainer.grid(row=0, column=2, rowspan=6, columnspan=3, padx=30, sticky=W+E+N+S)
+
+    # monitor thread
+        self.monit_loop = threading.Thread(name='monitor', target=self._monitor)
+        self.monit_loop.setDaemon(True)
+        self.monit_loop.start()
+
+    def _set_joints(self):
+        angles = []
+        for i in range(self.num_joints):
+            angles.append(self.joint_angles[i].get())
+        self._root.get_robot().set_joint_angles(angles) 
+
+    def _reset_joints(self):
+        angles = []
+        for i in range(self.num_joints):
+            self.joint_angles[i].set(90)
+            angles.append(90)
+        self._root.get_robot().set_joint_angles(angles) 
+    
+    def _monitor(self):
+        t = now()
+        while True:
+            if (now()- t)>UPDATE_INTERVAL:
+                current_angles = self._root.get_robot().get_joint_angles()
+                if current_angles:
+                    for i in range(self.num_joints):
+                        self.current_angles[i].set(current_angles[i])
+                    t = now()
 
 
 class SettingPage(Frame):
     def __init__(self, root):
         Frame.__init__(self, width=page_width, height=page_height)
         self._root = root
-        self._create()
     
-    def _create(self):
+    def create(self):
         # self.robot = Robot()
         Label(self, text="类型").grid(row=0, column=0, pady=20, sticky=W)
         self.robot_model = ttk.Combobox(self, values=MODEL_LIST)
@@ -65,13 +140,11 @@ class SettingPage(Frame):
         Button(self, text="连接", width=10, command=self._connect).grid(row=3, column=1, pady=10, sticky=E)
 
     def _connect(self):
-        model = self.robot_model.get()
+        name = self.robot_model.get()
         port = self.port.get()
         baudrate = self.baudrate.get()
 
-        #self._root.get_robot()
-
-        self._root._status_info("连接机械臂 型号：{} 端口：{} 波特率：{}".format(self.robot_model.get(), self.port.get(), self.baudrate.get()))
+        self._root.connect_robot(name, port, baudrate)
 
 
 class Application(object):
@@ -90,17 +163,55 @@ class Application(object):
         self._connected = False
         self._robot = None
 
+        self.robot_model = ""   # todo - get from robot instance
         self._create_gui()
 
     def start(self):
-        self._status_info('欢迎使用armMaster!')
+        self.status_info('欢迎使用armMaster!')
         self._root.mainloop()
+
+    def get_robot(self):
+        if self._robot is None:
+            messagebox.showerror("InternalErr", "No robot instance!")
+        else:
+            return self._robot
+
+    def robot_is_connected(self):
+        return self._connected
+
+    def connect_robot(self, name, port, baudrate):
+        self.robot_model = name # to be optimised
+
+        # create robot 
+        if self._robot is None:
+            self._robot = Robot()
+            if not self._robot.configure(name, port, baudrate):
+                self.status_error("配置机械臂参数失败。检查参数设置是否正确。")
+                return
+            if not self._robot.initialize():
+                self.status_error("机械臂初始化失败。检查USB是否连接，端口及波特率是否正确。")
+            else:
+                self._robot.start()
+                self.status_info("机械臂就绪 型号：{} 端口：{} 波特率：{}".format(name, port, baudrate))
+                self._connected = True
+        else:
+            # 是否需要建立新的连接？
+            pass
+
+    def status_info(self, val):
+        self._statusbar.config(bg='white')
+        self._statustext.set(val)
+
+    def status_error(self, val):
+        self._statusbar.config(bg='Red')
+        self._statustext.set(val)
 
     def _create_gui(self):
         # 页面
         self._control_page = ControlPage(self)
         self._setting_page = SettingPage(self)
         self._current_page = self._setting_page
+        self._current_page.create()
         self._current_page.pack()
 
         # 菜单栏
@@ -115,12 +226,6 @@ class Application(object):
         self._statusbar = Label(self._root, textvariable=self._statustext, bd=1, anchor=W)
         self._statusbar.pack(side=BOTTOM, fill=X)
 
-    def get_robot(self):
-        if self._robot is None:
-            messagebox.showerror("InternalErr", "No robot instance!")
-        else:
-            return self._robot
-
     def _control(self):
         self._change_page(self._control_page)
 
@@ -130,17 +235,10 @@ class Application(object):
     def _exit(self):
         self._root.quit()
 
-    def _status_info(self, val):
-        self._statusbar.config(bg='white')
-        self._statustext.set(val)
-
-    def _status_error(self, val):
-        self._statusbar.config(bg='Red')
-        self._statustext.set(val)
-
     def _change_page(self, page):
         self._current_page.pack_forget()
         self._current_page = page
+        self._current_page.create()
         self._current_page.pack()
 
 
