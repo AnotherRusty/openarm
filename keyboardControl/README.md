@@ -24,3 +24,5 @@ For python 3
 ```
 python3 keyboardControl.py
 ```
+
+`Note:` On Windows platform, please run this script in the cmd terminal or powershell terminal. Other terminals are not tested.
