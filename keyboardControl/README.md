@@ -1,7 +1,9 @@
 # Openarm Keyboard Control
 The keyboard control python script listens to keyboard inputs and controls arms accordingly.
 
-Required dependency: pynput  
+Required dependencies: 
+- pynput  
+- pyyaml
 
 ## To install pynput:  
 For python 2
@@ -12,6 +14,17 @@ pip install pynput
 For python 3
 ```
 pip3 install pynput
+```
+
+## To install pynput:  
+For python 2
+```
+pip install pyyaml
+```
+
+For python 3
+```
+pip3 install pyyaml
 ```
 
 ## To run the script
