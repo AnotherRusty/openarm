@@ -25,7 +25,11 @@ KeyBindings = {
 
 
 def on_press(key):
-    key = str(key).strip("'")
+    key_type = type(key).__name__
+    if (key_type == 'Key'):
+        key = str(key)
+    elif (key_type == 'KeyCode'):
+        key = key.char
     if key in KeyBindings.keys():
         joint = KeyBindings[key][0]
         increase = KeyBindings[key][1]
@@ -47,7 +51,7 @@ def setting_up():
         conf = yaml.safe_load(f)
         f.close()
 
-    start_up_positions = conf['StartUpJointPositions'].copy()
+    start_up_positions = conf['StartUpJointPositions'][:]
     num_of_joints = len(start_up_positions)
     for i in range(num_of_joints):
         CurrentJointPosisitons.append(float(start_up_positions[i]))
@@ -57,7 +61,6 @@ def setting_up():
 def control_loop():
     # check for joint position changes and send commands to the robot
     print(CurrentJointPosisitons)
-
 
 if __name__ == '__main__':
     setting_up()
