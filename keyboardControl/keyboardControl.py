@@ -15,12 +15,12 @@ KeyBindings = {
     'Key.right':(0, True),
     'Key.up':(1,False),
     'Key.down':(1, True),
-    'q':(2, False),
-    'a':(2, True),
-    'w':(3, False),
-    's':(3, True),
-    'Key.ctrl_l':(4, False),
-    'Key.space':(4, True)
+    'w':(2, False),
+    's':(2, True),
+    'a':(3, False),
+    'd':(3, True),
+    'q':(4, False),
+    'e':(4, True)
 }
 
 
