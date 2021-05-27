@@ -4,6 +4,10 @@
 from pynput import keyboard
 import yaml
 
+import sys, os
+sys.path.append(os.path.join(sys.path[0], '..', 'armMaster', 'lib'))
+from robot import Robot
+
 Terminated = False
 ConfigFile = 'config/config.yaml'
 

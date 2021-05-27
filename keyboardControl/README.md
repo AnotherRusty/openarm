@@ -4,6 +4,7 @@ The keyboard control python script listens to keyboard inputs and controls arms 
 Required dependencies: 
 - pynput  
 - pyyaml
+- pyserial
 
 ## To install pynput:  
 For python 2
@@ -25,6 +26,17 @@ pip install pyyaml
 For python 3
 ```
 pip3 install pyyaml
+```
+
+## To install pynput:  
+For python 2
+```
+pip install pyserial
+```
+
+For python 3
+```
+pip3 install pyserial
 ```
 
 ## To run the script
