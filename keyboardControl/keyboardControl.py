@@ -7,9 +7,11 @@ import yaml
 Terminated = False
 ConfigFile = 'config/config.yaml'
 
+MinJointPosition = None
+MaxJointPosition = None
 CurrentJointPosisitons = []
 
-Increment = 0.1
+Increment = None
 KeyBindings = {
     'Key.left':(0, False),
     'Key.right':(0, True),
@@ -35,8 +37,12 @@ def on_press(key):
         increase = KeyBindings[key][1]
         if increase:
             CurrentJointPosisitons[joint]+=Increment
+            if (CurrentJointPosisitons[joint] > MaxJointPosition):
+                CurrentJointPosisitons[joint] = MaxJointPosition
         else:
             CurrentJointPosisitons[joint]-=Increment
+            if (CurrentJointPosisitons[joint] < MinJointPosition):
+                CurrentJointPosisitons[joint] = MinJointPosition
 
 def on_release(key):
     global Terminated
@@ -47,10 +53,17 @@ def on_release(key):
 KeyListener = keyboard.Listener(on_press=on_press,on_release=on_release)
 
 def setting_up():
+    global MinJointPosition, MaxJointPosition, Increment
+
     with open(ConfigFile) as f:
         conf = yaml.safe_load(f)
         f.close()
 
+    MinJointPosition = int(conf['MinJointPosition'])
+    MaxJointPosition = int(conf['MaxJointPosition'])
+
+    Increment = conf['Increment']
+    
     start_up_positions = conf['StartUpJointPositions'][:]
     num_of_joints = len(start_up_positions)
     for i in range(num_of_joints):
