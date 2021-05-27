@@ -88,20 +88,33 @@ def setting_up():
         return
     sleep(2)
     print('Start ...')
-    RobotInstance.start()
+    RobotInstance.start(feedbackEnabled=False)
 
     print('Starting keyboard listener ...')
     KeyListener.start()
 
 def control_loop():
-    # check for joint position changes and send commands to the robot
-    print(CurrentJointPosisitons)
+    last_joint_positions = []
+    for pos in CurrentJointPosisitons:
+        last_joint_positions.append(int(pos))
+    
+    while not Terminated:
+        # check for joint position changes and send commands to the robot
+        current_joint_positions = []
+        for pos in CurrentJointPosisitons:
+            current_joint_positions.append(int(pos))
+        
+        # compare with last
+        changed = False
+        for old, new in zip(last_joint_positions, current_joint_positions):
+            if (old != new):
+                changed = True
+        if changed:
+            RobotInstance.set_joint_angles(current_joint_positions)
+            last_joint_positions = current_joint_positions
+
 
 if __name__ == '__main__':
     setting_up()
-    
-    while not Terminated:
-        #control_loop()
-        pass
-
+    control_loop()
     print("Keyboard control terminated.")

@@ -1,7 +1,7 @@
 MinJointPosition: 0
 MaxJointPosition: 180
 
-Increment: 0.5
+Increment: 1.0
 
 # Robot
 Model: 'victor'
