@@ -19,11 +19,15 @@ class Robot:
         self.__configured = False
         self.__waiting_for = None
 
-    def configure(self, name, port, baudrate):
-        self.name = name
+    def configure(self, model, port, baudrate, modelfile=None):
+        self.name = model
+
+        if modelfile is None:
+            config_file = 'config/'+self.name+'.yaml'
+        else:
+            config_file = modelfile
 
         try:
-            config_file = 'config/'+self.name+'.yaml'
             with open(config_file) as f:
                 conf = yaml.safe_load(f)
                 f.close()
@@ -31,7 +35,7 @@ class Robot:
             self.__baudrate = baudrate
             self.__num_joints = len(conf['Joints'])
         except:
-            print("[Error] Configuration failed. \n ***** Please make sure " + self.name + ".yaml exists.")
+            print("[Error] Configuration failed. \n ***** Please make sure " + config_file + " exists.")
             return False
         self.__configured = True
         return True
