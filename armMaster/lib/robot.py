@@ -18,6 +18,7 @@ class Robot:
         self.__initialized = False
         self.__configured = False
         self.__waiting_for = None
+        self.__robot_response_disabled = False
 
     def configure(self, model, port, baudrate, modelfile=None):
         self.name = model
@@ -55,10 +56,13 @@ class Robot:
         self.__initialized = True
         return True
 
-    def start(self):
+    def start(self, feedbackEnabled=True):
         if not self.__initialized:
             print("Error: Robot has not been initialized.")
             return
+        if not feedbackEnabled:
+            self.__robot_response_disabled = True
+
         self.__proc.start()
 
     def shutdown(self):
@@ -81,10 +85,13 @@ class Robot:
 
     def __run(self):
         while not self.__shutdown:
-            c = self.__transport.read()
-            # print(c)
-            if self.__protocol.parse(c):
-                self.__process_message(self.__protocol.get_message()) 
+            if self.__robot_response_disabled:
+                pass
+            else:
+                c = self.__transport.read()
+                # print(c)
+                if self.__protocol.parse(c):
+                    self.__process_message(self.__protocol.get_message()) 
 
     def __process_message(self, msg_id):
         if msg_id == MsgId.MOVE_DONE:
