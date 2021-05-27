@@ -3,4 +3,9 @@ MaxJointPosition: 180
 
 Increment: 0.5
 
+# Robot
+Model: 'victor'
+Port: '/dev/openarm'
+Baudrate: 9600
+
 StartUpJointPositions: [90, 90, 90, 90, 90]

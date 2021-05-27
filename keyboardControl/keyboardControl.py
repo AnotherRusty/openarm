@@ -3,7 +3,7 @@
 
 from pynput import keyboard
 import yaml
-
+from time import sleep
 import sys, os
 sys.path.append(os.path.join(sys.path[0], '..', 'armMaster', 'lib'))
 from robot import Robot
@@ -29,6 +29,7 @@ KeyBindings = {
     'e':(4, True)
 }
 
+RobotInstance = None
 
 def on_press(key):
     key_type = type(key).__name__
@@ -58,6 +59,7 @@ KeyListener = keyboard.Listener(on_press=on_press,on_release=on_release)
 
 def setting_up():
     global MinJointPosition, MaxJointPosition, Increment
+    global RobotInstance
 
     with open(ConfigFile) as f:
         conf = yaml.safe_load(f)
@@ -73,6 +75,22 @@ def setting_up():
     for i in range(num_of_joints):
         CurrentJointPosisitons.append(float(start_up_positions[i]))
 
+    model = conf['Model']
+    port = conf['Port']
+    baudrate = conf['Baudrate']
+    configfile = os.path.join(sys.path[0], '..', 'armMaster', 'config', model+'.yaml')
+    RobotInstance = Robot()
+    print('Configuring robot ...')
+    if not RobotInstance.configure(model, port, baudrate, configfile):
+        return
+    print('Initializing robot ...')
+    if not RobotInstance.initialize():
+        return
+    sleep(2)
+    print('Start ...')
+    RobotInstance.start()
+
+    print('Starting keyboard listener ...')
     KeyListener.start()
 
 def control_loop():
@@ -83,6 +101,7 @@ if __name__ == '__main__':
     setting_up()
     
     while not Terminated:
-        control_loop()
+        #control_loop()
+        pass
 
     print("Keyboard control terminated.")
